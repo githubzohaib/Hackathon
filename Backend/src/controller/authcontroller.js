@@ -2,7 +2,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-
+//hhlll
 // ✅ Signup
 export const signup = async (req, res) => {
   try {
