@@ -1,21 +1,28 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import Applayout from "./components/layouts/AppLayout";
-import NoMatch from "./pages/NoMatch";
-import Error500 from "./pages/Error500";
+// src/router.tsx
+import { createBrowserRouter } from "react-router-dom";
+import AppLayout from "./components/layouts/AppLayout";
+import Login from "./components/layouts/Login";
+import SignUp from "./components/layouts/SignUp";
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
-    element: <Applayout/>,
+    element: <AppLayout />,
+    children: [
+      {
+        index: true, // default route → /login
+        element: <Login />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "signup",
+        element: <SignUp />,
+      },
+    ],
   },
-  {
-    path: "/error", // ✅ NEW
-    element: <Error500 />,
-  },
-  {
-    path: "*",
-    element: <NoMatch />,
-  },
-], {
-  basename: global.basename
-});
+]);
+
+export default router;

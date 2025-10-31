@@ -1,11 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import "./index.css"
+// src/main.tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
+import router from "./Router";
+import "./index.css"; // make sure Tailwind is imported
 
-ReactDOM.render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-      <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );
