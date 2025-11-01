@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -17,23 +18,55 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
+  // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
     if (!agreeToTerms) {
       alert("Please agree to the terms and conditions");
       return;
     }
+
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-    console.log("Sign up attempted with:", formData);
-    // ✅ redirect to login after successful signup
-    navigate("/login");
+
+    try {
+      const res = await axios.post("http://localhost:5001/api/auth/signup", {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+
+      console.log("Signup response:", res.data);
+
+      // Handle success message properly
+      if (res.data.message) {
+        alert(res.data.message);
+      } else if (res.data.success) {
+        alert("Signup successful!");
+      } else {
+        alert("Signup completed!");
+      }
+
+      navigate("/login");
+    } catch (err: any) {
+      console.error("Signup error:", err.response?.data);
+
+      // Handle backend errors safely
+      const backendMessage =
+        err.response?.data?.message || err.response?.data?.error || "Signup failed";
+
+      alert(backendMessage);
+    }
   };
 
   return (
@@ -49,6 +82,7 @@ export default function SignUp() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
               <div className="relative">
@@ -65,6 +99,7 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <div className="relative">
@@ -81,6 +116,7 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
               <div className="relative">
@@ -97,6 +133,7 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
@@ -120,6 +157,7 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
               <div className="relative">
@@ -143,6 +181,7 @@ export default function SignUp() {
               </div>
             </div>
 
+            {/* Terms */}
             <div className="flex items-start">
               <input
                 type="checkbox"

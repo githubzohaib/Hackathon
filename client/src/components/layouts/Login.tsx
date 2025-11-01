@@ -1,7 +1,8 @@
+// src/components/layouts/Login.tsx
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "./Authapi";
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,29 +13,38 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    const data = await loginUser(email, password);
-    console.log("✅ Login success:", data);
-    localStorage.setItem("token", data.token);
-    navigate("/dashboard"); // or wherever you want
-  } catch (error: any) {
-    alert(error.message || "Login failed");
-  }
- };
-
-  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password, rememberMe });
-    // ✅ Example: redirect after login success
-    navigate("/signup");
+    try {
+      const res = await axios.post("http://localhost:5001/api/auth/login", {
+        email,
+        password,
+      });
+
+      // Assuming backend returns { user: {...}, token: "..." }
+      const user = res.data.user;
+
+      if (user) {
+        alert("Login successful!");
+
+        if (rememberMe) {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+
+        // Redirect to Dashboard
+        navigate("/dashboard");
+      } else {
+        alert(res.data.message || "Login failed");
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4">
               <Lock className="w-8 h-8 text-white" />
@@ -43,15 +53,16 @@ export default function Login() {
             <p className="text-gray-600">Sign in to your account</p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -62,13 +73,15 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Password Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -86,21 +99,23 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Remember Me */}
             <div className="flex items-center justify-between">
-              <label className="flex items-center cursor-pointer">
+              <label className="flex items-center">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                 />
                 <span className="ml-2 text-sm text-gray-700">Remember me</span>
               </label>
-              <button type="button" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+              <a href="#" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
                 Forgot password?
-              </button>
+              </a>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition duration-200"
@@ -109,6 +124,17 @@ export default function Login() {
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">Or</span>
+            </div>
+          </div>
+
+          {/* Signup Link */}
           <p className="mt-8 text-center text-sm text-gray-600">
             Don’t have an account?{" "}
             <Link to="/signup" className="text-indigo-600 hover:text-indigo-500 font-semibold">
