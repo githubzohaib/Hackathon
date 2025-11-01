@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Cloud, Droplets, Wind, Sun, AlertTriangle, Thermometer, MapPin, Sprout, Calendar, TrendingUp, Eye } from "lucide-react";
-
+//hello
 const API_KEY = "JWMARLCN9B8QLURM9X646KTZK";
 
 interface WeatherCurrent {
