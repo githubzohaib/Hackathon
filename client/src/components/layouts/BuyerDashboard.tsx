@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   Cloud,
@@ -22,6 +23,7 @@ type Particle = {
 };
 
 export default function BuyerDashboard() {
+  const navigate = useNavigate();
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
@@ -47,15 +49,16 @@ export default function BuyerDashboard() {
       icon: Cloud,
       gradient: "from-blue-500 to-cyan-500",
       description: "7-day weather predictions",
-      path: "/buyer/weather",
+      path: "/weather",
     },
     {
       id: 2,
-      title: "Market Exchange",
+      title: "Market Trends",
       icon: TrendingUp,
       gradient: "from-emerald-500 to-green-600",
-      description: "Live crop prices & trends",
-      path: "/buyer/market",
+      description: "Market trends",
+      stats: "15 Active Markets",
+      path: "/markettrend",
     },
     {
       id: 3,
@@ -64,10 +67,19 @@ export default function BuyerDashboard() {
       gradient: "from-purple-500 to-pink-600",
       description: "Direct farmer communication",
       badge: "3 New",
-      path: "/buyer/farmer-chat",
+      path: "/farmerchat",
     },
     {
       id: 4,
+      title: "Pricing Of Products",
+      icon: TrendingUp,
+      gradient: "from-emerald-500 to-green-600",
+      description: "Crop prices",
+      stats: "15 Active Markets",
+      path: "/pricing",
+    },
+    {
+      id: 5,
       title: "Purchase Products",
       icon: Package,
       gradient: "from-amber-500 to-orange-600",
@@ -75,6 +87,17 @@ export default function BuyerDashboard() {
       path: "/buyer/purchase",
     },
   ];
+
+  const handleLogout = () => {
+    // Clear any stored user data
+    localStorage.removeItem('rememberedUser');
+    // Navigate to login page
+    navigate('/login');
+  };
+
+  const handleCardClick = (path: string) => {
+    navigate(path);
+  };
 
   const ParticleIcon = ({ type }: { type: "leaf" | "droplet" | "seed" }) => {
     if (type === "leaf")
@@ -148,7 +171,14 @@ export default function BuyerDashboard() {
             </div>
             <button
               className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-red-500/20 border border-red-400/30 rounded-xl text-white hover:bg-red-500/30 transition-all backdrop-blur-xl"
-              onClick={() => console.log("Logout")}
+              onClick={() => {
+                // ✅ Clear any saved session or user data
+                localStorage.removeItem("userToken");
+                localStorage.removeItem("userData");
+  
+                // ✅ Redirect to login page
+                navigate("/login");
+              }}
             >
               <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline text-sm">Logout</span>
@@ -172,7 +202,7 @@ export default function BuyerDashboard() {
                 key={card.id}
                 className="animate-slide-in group cursor-pointer"
                 style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-                onClick={() => console.log(`Navigate to ${card.path}`)}
+                onClick={() => handleCardClick(card.path)}
               >
                 <div
                   className={`relative rounded-2xl p-6 border border-white/40 bg-white/15 backdrop-blur-3xl shadow-[0_20px_60px_-15px_rgba(34,197,94,0.4)] hover:shadow-[0_25px_80px_-15px_rgba(34,197,94,0.6)] transition-all duration-300 hover:scale-105 hover:bg-white/25 h-full`}

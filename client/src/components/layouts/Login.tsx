@@ -81,16 +81,16 @@ export default function ArzEPakLogin() {
       setTimeout(() => {
         switch (selectedRole) {
           case "farmer":
-            navigate("/farmer-dashboard");
+            navigate("/farmerdashboard");
             break;
           case "expert":
-            navigate("/expert-dashboard");
+            navigate("/expertdashboard");
             break;
           case "admin":
-            navigate("/admin-dashboard");
+            navigate("/admindashboard");
             break;
           case "buyer":
-            navigate("/buyer-dashboard");
+            navigate("/buyerdashboard");
             break;
           default:
             navigate("/");

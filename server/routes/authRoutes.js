@@ -1,6 +1,9 @@
+// routes/auth.js
 import express from "express";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+
 
 const router = express.Router();
 
@@ -9,30 +12,28 @@ const router = express.Router();
 ======================== */
 router.post("/signup", async (req, res) => {
   try {
-    const { fullName, email, phone, password } = req.body;
+    const { name, phone, email, password, role } = req.body;
 
-    // Check if user already exists
+    // Check existing user
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+    if (existingUser)
+      return res.status(400).json({ message: "Email already registered." });
 
-    // ✅ Hash password before saving
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
-      fullName,
-      email,
+    const user = await User.create({
+      name,
       phone,
+      email,
       password: hashedPassword,
+      role,
     });
 
-    await newUser.save();
-
-    res.status(201).json({ success: true, message: "User registered successfully" });
-  } catch (err) {
-    console.error("Signup error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(201).json({ message: "User created successfully", user });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ message: "Server error during signup." });
   }
 });
 
@@ -40,39 +41,55 @@ router.post("/signup", async (req, res) => {
    ✅ LOGIN ROUTE
 ======================== */
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password, role } = req.body;
+
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
+    if (!user) return res.status(400).json({ message: "User not found" });
 
-    // Detect if password is hashed (supports $2a$, $2b$, $2y$)
-    let isHashed = user.password.startsWith("$2a$")
-      || user.password.startsWith("$2b$")
-      || user.password.startsWith("$2y$");
-
-    let isMatch = false;
-
-    if (isHashed) {
-      isMatch = await bcrypt.compare(password, user.password);
-    } else {
-      isMatch = password === user.password;
-    }
-
-    if (!isMatch) {
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
       return res.status(400).json({ message: "Invalid credentials" });
-    }
 
-    res.json({ user, message: "Login successful" });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error" });
+    // Check role
+    if (user.role !== role)
+      return res.status(403).json({ message: "Role mismatch" });
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error during login." });
   }
 });
 
+/* ========================
+   ✅ FORGOT PASSWORD (Mock)
+======================== */
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // In production, you’d send an email with a reset link.
+  res.json({ message: "Password reset link sent to email (mock)." });
+});
 
 export default router;
-
-

@@ -1,3 +1,4 @@
+// db.js
 import mongoose from "mongoose";
 
 const connectDB = async () => {
@@ -6,9 +7,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("✅ Connected to MongoDB (Local)");
+    console.log("✅ MongoDB Connected Successfully!");
   } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
+    console.error("❌ MongoDB Connection Failed:", error.message);
     process.exit(1);
   }
 };

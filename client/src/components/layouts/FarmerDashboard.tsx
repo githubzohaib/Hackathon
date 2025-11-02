@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+
 import {
   Camera,
   Phone,
@@ -70,14 +71,25 @@ export default function FarmerDashboard() {
     },
     {
       id: 2,
-      title: "Market Exchange",
-      icon: TrendingUp,
-      gradient: "from-emerald-500 to-green-600",
-      description: "Live crop prices & trends",
-      path: "/market",
+      title: "AI Chatbot",
+      icon: MessageCircle,
+      gradient: "from-indigo-500 to-violet-600",
+      description: "Ask AI for farming help",
+      path: "/chatbot",
     },
+
     {
       id: 3,
+      title: "Market Trends",
+      icon: TrendingUp,
+      gradient: "from-emerald-500 to-green-600",
+      description: "Market trends",
+      stats: "15 Active Markets",
+      path: "/markettrend",
+    },
+   
+    {
+      id: 4,
       title: "Buyer Notifications",
       icon: Bell,
       gradient: "from-amber-500 to-orange-600",
@@ -85,8 +97,19 @@ export default function FarmerDashboard() {
       path: "/notifications",
       badge: "3 New",
     },
+
     {
-      id: 4,
+      id: 5,
+      title: "Prcing Of Products",
+      icon: TrendingUp,
+      gradient: "from-emerald-500 to-green-600",
+      description: "Crop prices",
+      stats: "15 Active Markets",
+      path: "/pricing",
+    },
+
+    {
+      id: 6,
       title: "Chat with Buyers",
       icon: MessageCircle,
       gradient: "from-purple-500 to-pink-600",
@@ -94,7 +117,7 @@ export default function FarmerDashboard() {
       path: "/buyer-chat",
     },
     {
-      id: 5,
+      id: 7,
       title: "Expert Consultation",
       icon: Users,
       gradient: "from-teal-500 to-emerald-600",
@@ -102,12 +125,12 @@ export default function FarmerDashboard() {
       path: "/expert-chat",
     },
     {
-      id: 6,
+      id: 8,
       title: "Submit Complaint",
       icon: FileText,
       gradient: "from-red-500 to-rose-600",
       description: "Report issues & concerns",
-      path: "/complaint",
+      path: "/complaintdashboard",
     },
   ];
 
@@ -221,12 +244,19 @@ export default function FarmerDashboard() {
               </div>
             </div>
             <button
-              className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-red-500/20 border border-red-400/30 rounded-xl text-white hover:bg-red-500/30 transition-all backdrop-blur-xl"
-              onClick={() => console.log("Logout")}
-            >
-              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="hidden sm:inline text-sm">Logout</span>
-            </button>
+            className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-red-500/20 border border-red-400/30 rounded-xl text-white hover:bg-red-500/30 transition-all backdrop-blur-xl"
+            onClick={() => {
+              // ✅ Clear any saved session or user data
+              localStorage.removeItem("userToken");
+              localStorage.removeItem("userData");
+
+              // ✅ Redirect to login page
+              navigate("/login");
+            }}
+          >
+            <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline text-sm">Logout</span>
+          </button>
           </div>
 
           {/* Profile Card - Glassmorphic */}

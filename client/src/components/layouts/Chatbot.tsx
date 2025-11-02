@@ -5,10 +5,7 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<{ role: "user" | "bot"; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Your API key here (replace with your own, keep it private)
   const API_KEY = "AIzaSyB4iFOLZ0hGQ_-szQKgxtilzWL6Uky7daE";
-
-  // Use a model name that exists (e.g., "gemini-2.0-flash-lite") from official list
   const MODEL_NAME = "gemini-2.0-flash-lite";
 
   const sendToGemini = async (msg: string) => {
@@ -22,10 +19,10 @@ export default function Chatbot() {
             contents: [
               {
                 role: "user",
-                parts: [{ text: `Tum agriculture expert ho. Simple Urdu me jawab do.\nUser: ${msg}` }]
-              }
-            ]
-          })
+                parts: [{ text: `Tum agriculture expert ho. Simple Urdu me jawab do.\nUser: ${msg}` }],
+              },
+            ],
+          }),
         }
       );
 
@@ -33,8 +30,7 @@ export default function Chatbot() {
       console.log("API response:", data);
 
       if (!response.ok) {
-        // show error from API
-        return `Error from API: ${data.error?.message || response.status}`;
+        return `Error: ${data.error?.message || response.status}`;
       }
 
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -59,66 +55,55 @@ export default function Chatbot() {
   };
 
   return (
-    <div style={{
-      width: "100%",
-      maxWidth: 600,
-      margin: "40px auto",
-      padding: 15,
-      border: "1px solid #ddd",
-      borderRadius: 10
-    }}>
-      <h2 style={{ textAlign: "center", fontWeight: "bold" }}>🌾 Farmer AI Chatbot</h2>
+    <div
+      className="fixed top-0 left-0 w-screen h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      style={{
+        backgroundImage: "url('/images/background.jpg')",
+      }}
+    >
+      {/* Overlay gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-green-900/70 via-emerald-800/60 to-green-900/70"></div>
 
-      <div style={{
-        height: 350,
-        overflowY: "auto",
-        marginTop: 10,
-        background: "#f5f5f5",
-        borderRadius: 8,
-        padding: 10
-      }}>
-        {messages.map((m, i) => (
-          <div key={i} style={{
-            textAlign: m.role === "user" ? "right" : "left",
-            marginBottom: 8
-          }}>
-            <span style={{
-              display: "inline-block",
-              padding: "8px 12px",
-              background: m.role === "user" ? "#d1f8d1" : "#e7e7e7",
-              borderRadius: 8
-            }}>
-              {m.text}
-            </span>
-          </div>
-        ))}
-        {loading && <p>⏳ Thinking…</p>}
-      </div>
+      {/* Glassmorphic Chat Container */}
+      <div className="relative z-10 w-full max-w-lg p-6 rounded-3xl backdrop-blur-xl bg-white/15 border border-white/20 shadow-2xl">
+        <h2 className="text-2xl font-bold text-white text-center mb-4 drop-shadow">
+          🌾 Farmer AI Chatbot
+        </h2>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Farming sawal likho..."
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #aaa"
-          }}
-        />
-        <button
-          onClick={handleSend}
-          style={{
-            padding: "10px 15px",
-            background: "green",
-            color: "#fff",
-            borderRadius: 8
-          }}
-        >
-          Send
-        </button>
+        {/* Chat window */}
+        <div className="h-96 overflow-y-auto mb-4 p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
+          {messages.map((m, i) => (
+            <div key={i} className={`mb-3 ${m.role === "user" ? "text-right" : "text-left"}`}>
+              <span
+                className={`inline-block px-4 py-2 rounded-2xl ${
+                  m.role === "user"
+                    ? "bg-emerald-400/30 text-white backdrop-blur-sm border border-emerald-300/30"
+                    : "bg-white/20 text-emerald-100 border border-white/30"
+                }`}
+              >
+                {m.text}
+              </span>
+            </div>
+          ))}
+          {loading && <p className="text-emerald-200 italic">⏳ Soch raha hoon...</p>}
+        </div>
+
+        {/* Input area */}
+        <div className="flex gap-2">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="Farming sawal likho..."
+            className="flex-1 px-4 py-2 rounded-2xl bg-white/20 text-white placeholder-emerald-200 focus:outline-none border border-white/30"
+          />
+          <button
+            onClick={handleSend}
+            className="px-5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md transition"
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

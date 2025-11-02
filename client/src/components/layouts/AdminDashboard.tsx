@@ -42,17 +42,18 @@ export default function AdminDashboard() {
       gradient: "from-blue-500 to-cyan-500",
       description: "Monitor weather data & forecasts",
       stats: "7 Regions Active",
-      path: "/admin/weather",
+      path: "/weather",
     },
     {
       id: 2,
-      title: "Market Exchange",
+      title: "Market Trends",
       icon: TrendingUp,
       gradient: "from-emerald-500 to-green-600",
-      description: "Manage crop prices & market trends",
+      description: "Market trends",
       stats: "15 Active Markets",
-      path: "/admin/market",
+      path: "/markettrend",
     },
+    
     {
       id: 3,
       title: "View Complaints",
@@ -63,8 +64,18 @@ export default function AdminDashboard() {
       stats: "23 Total This Week",
       path: "/admin/complaints",
     },
+
     {
       id: 4,
+      title: "Prcing Of Products",
+      icon: TrendingUp,
+      gradient: "from-emerald-500 to-green-600",
+      description: "Crop prices",
+      stats: "15 Active Markets",
+      path: "/pricing",
+    },
+    {
+      id: 5,
       title: "Report Analytics",
       icon: BarChart3,
       gradient: "from-purple-500 to-pink-600",
@@ -140,7 +151,14 @@ export default function AdminDashboard() {
             </div>
             <button
               className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-red-500/20 border border-red-400/30 rounded-xl text-white hover:bg-red-500/30 transition-all backdrop-blur-xl"
-              onClick={() => console.log("Logout")}
+              onClick={() => {
+                // ✅ Clear any saved session or user data
+                localStorage.removeItem("userToken");
+                localStorage.removeItem("userData");
+
+                // ✅ Redirect to login page
+                navigate("/login");
+              }}
             >
               <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline text-sm">Logout</span>
