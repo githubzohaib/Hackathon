@@ -4,10 +4,9 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 
-dotenv.config();
-const app = express();
+dotenv.config(); // ✅ Must be called before connectDB()
 
-// Middleware
+const app = express();
 app.use(express.json());
 app.use(cors());
 

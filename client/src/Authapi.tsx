@@ -1,10 +1,8 @@
-// src/api/authApi.ts
+// src/api/Authapi.tsx
 import axios from "axios";
 
-// Your backend server URL (adjust the port if needed)
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "http://localhost:5001/api/auth";  // ✅ corrected port
 
-// ✅ Signup API
 export const signupUser = async (userData: {
   fullName: string;
   email: string;
@@ -20,7 +18,6 @@ export const signupUser = async (userData: {
   }
 };
 
-// ✅ Login API
 export const loginUser = async (email: string, password: string) => {
   try {
     const response = await axios.post(`${API_URL}/login`, { email, password });
