@@ -71,44 +71,129 @@ export default function ArzEPakLogin() {
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   // ✅ Role-based Login
-  const handleLogin = () => {
-    if (!validateEmail(loginData.email)) return showPopup("error", "Please enter a valid email address");
-    if (loginData.password.length < 8) return showPopup("error", "Password must be at least 8 characters long");
-    const user = users.find((u) => u.email === loginData.email && u.password === loginData.password);
-    if (user) {
-      showPopup("success", `Welcome back, ${selectedRole}! Redirecting...`);
-      if (rememberMe) localStorage.setItem("rememberedUser", JSON.stringify(user));
-      setTimeout(() => {
-        switch (selectedRole) {
-          case "farmer":
-            navigate("/farmerdashboard");
-            break;
-          case "expert":
-            navigate("/expertdashboard");
-            break;
-          case "admin":
-            navigate("/admindashboard");
-            break;
-          case "buyer":
-            navigate("/buyerdashboard");
-            break;
-          default:
-            navigate("/");
-        }
-      }, 2000);
-    } else showPopup("error", "Invalid credentials. Please try again.");
-  };
+  // const handleLogin = () => {
+  //   if (!validateEmail(loginData.email)) return showPopup("error", "Please enter a valid email address");
+  //   if (loginData.password.length < 8) return showPopup("error", "Password must be at least 8 characters long");
+  //   const user = users.find((u) => u.email === loginData.email && u.password === loginData.password);
+  //   if (user) {
+  //     showPopup("success", `Welcome back, ${selectedRole}! Redirecting...`);
+  //     if (rememberMe) localStorage.setItem("rememberedUser", JSON.stringify(user));
+  //     setTimeout(() => {
+  //       switch (selectedRole) {
+  //         case "farmer":
+  //           navigate("/farmerdashboard");
+  //           break;
+  //         case "expert":
+  //           navigate("/expertdashboard");
+  //           break;
+  //         case "admin":
+  //           navigate("/admindashboard");
+  //           break;
+  //         case "buyer":
+  //           navigate("/buyerdashboard");
+  //           break;
+  //         default:
+  //           navigate("/");
+  //       }
+  //     }, 2000);
+  //   } else showPopup("error", "Invalid credentials. Please try again.");
+  // };
+
+  const handleLogin = async () => {
+  if (!validateEmail(loginData.email))
+    return showPopup("error", "Please enter a valid email address");
+  if (loginData.password.length < 8)
+    return showPopup("error", "Password must be at least 8 characters long");
+
+  try {
+    const res = await fetch("http://localhost:5001/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: loginData.email,
+        password: loginData.password,
+        role: selectedRole, // ✅ This must match your backend role field
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return showPopup("error", data.message || "Invalid credentials. Please try again.");
+    }
+
+    showPopup("success", `Welcome back, ${data.user.name || selectedRole}! Redirecting...`);
+    if (rememberMe) localStorage.setItem("userToken", data.token);
+
+    setTimeout(() => {
+      switch (selectedRole) {
+        case "farmer":
+          navigate("/farmerdashboard");
+          break;
+        case "expert":
+          navigate("/expertdashboard");
+          break;
+        case "admin":
+          navigate("/admindashboard");
+          break;
+        case "buyer":
+          navigate("/buyerdashboard");
+          break;
+        default:
+          navigate("/");
+      }
+    }, 2000);
+  } catch (err) {
+    console.error("Login error:", err);
+    showPopup("error", "Server not responding. Please try again.");
+  }
+};
+
 
   // ✅ Signup Handler
-  const handleSignup = () => {
-    if (!signupData.name || !signupData.email || !signupData.password)
-      return showPopup("error", "Please fill all fields");
-    if (!validateEmail(signupData.email)) return showPopup("error", "Enter a valid email");
-    if (signupData.password.length < 8) return showPopup("error", "Password must be at least 8 characters long");
-    setUsers([...users, signupData]);
+  // const handleSignup = () => {
+  //   if (!signupData.name || !signupData.email || !signupData.password)
+  //     return showPopup("error", "Please fill all fields");
+  //   if (!validateEmail(signupData.email)) return showPopup("error", "Enter a valid email");
+  //   if (signupData.password.length < 8) return showPopup("error", "Password must be at least 8 characters long");
+  //   setUsers([...users, signupData]);
+  //   showPopup("success", "Account created successfully! Please log in.");
+  //   setIsLogin(true);
+  // };
+
+  const handleSignup = async () => {
+  if (!signupData.name || !signupData.email || !signupData.password)
+    return showPopup("error", "Please fill all fields");
+  if (!validateEmail(signupData.email)) return showPopup("error", "Enter a valid email");
+  if (signupData.password.length < 8) return showPopup("error", "Password must be at least 8 characters long");
+
+  try {
+    const res = await fetch("http://localhost:5001/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: signupData.name,
+        phone: signupData.phone,
+        email: signupData.email,
+        password: signupData.password,
+        role: selectedRole,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return showPopup("error", data.message || "Signup failed");
+    }
+
     showPopup("success", "Account created successfully! Please log in.");
     setIsLogin(true);
-  };
+  } catch (err) {
+    console.error("Signup error:", err);
+    showPopup("error", "Server not responding. Please try again.");
+  }
+};
+
 
   // ✅ Forgot Password
   const handleForgot = () => {
